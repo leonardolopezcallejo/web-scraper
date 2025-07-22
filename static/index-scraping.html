@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Scraping by Garaje</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      background-color: #1a73e8;
+      color: white;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+    }
+
+    .panel {
+      width: 50%;
+      padding: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .scraper {
+      background-color: #ffffff;
+      border-right: 1px solid #ddd;
+    }
+
+    .chat {
+      background-color: #ffffff;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #155ab6;
+    }
+
+    #conversacion {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 16px;
+      background-color: #fafafa;
+      height: 60vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Web Scraping by Garaje</h1>
+
+  <div class="container">
+    <div class="panel scraper">
+      <h2>1️⃣ Scrapeo de URL</h2>
+      <input type="text" id="url" placeholder="Introduce una URL para scrapear..." />
+      <button onclick="scrapearYSubir()">Scrapear e indexar</button>
+      <div id="estadoScraper"></div>
+    </div>
+
+    <div class="panel chat">
+      <h2>2️⃣ Asistente IA</h2>
+      <div id="conversacion"></div>
+      <input type="text" id="entrada" placeholder="Haz tu pregunta aquí..." />
+      <button id="enviar">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    const entrada = document.getElementById("entrada");
+    const enviarBtn = document.getElementById("enviar");
+    const conversacion = document.getElementById("conversacion");
+
+    function scrollAbajo() {
+      conversacion.scrollTop = conversacion.scrollHeight;
+    }
+
+    function enviarPregunta() {
+      const pregunta = entrada.value.trim();
+      if (!pregunta) return;
+
+      conversacion.innerHTML += `🧑‍💻 Tú: ${pregunta}\n`;
+      entrada.value = "";
+      scrollAbajo();
+
+      fetch("http://127.0.0.1:8001/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto: pregunta })
+      })
+        .then(res => res.json())
+        .then(data => {
+          conversacion.innerHTML += `🤖 IA: ${data.respuesta}\n\n`;
+          scrollAbajo();
+        })
+        .catch(err => {
+          conversacion.innerHTML += `❌ Error: ${err}\n\n`;
+          scrollAbajo();
+        });
+    }
+
+    enviarBtn.addEventListener("click", enviarPregunta);
+    entrada.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        enviarPregunta();
+      }
+    });
+
+    function scrapearYSubir() {
+      const url = document.getElementById("url").value.trim();
+      if (!url) return;
+
+      document.getElementById("estadoScraper").innerText = "⏳ Procesando...";
+      document.getElementById("conversacion").innerHTML = ""; 
+
+
+      fetch("http://127.0.0.1:8001/scrap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("estadoScraper").innerText = `✅ ${data.resultado}`;
+        })
+        .catch(err => {
+          document.getElementById("estadoScraper").innerText = `❌ Error: ${err}`;
+        });
+    }
+  </script>
+</body>
+</html>
