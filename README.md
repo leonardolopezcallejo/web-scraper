@@ -39,7 +39,7 @@ source .venv/bin/activate  # o .venv\Scripts\activate en Windows
 pip install -r requirements.txt
 ```
 
-### Set environment variables
+### 3. Set environment variables
 ```bash
 AZURE_SEARCH_ENDPOINT=https://<nombre>.search.windows.net
 AZURE_SEARCH_KEY=<clave-api>
@@ -50,7 +50,7 @@ AZURE_OPENAI_ENDPOINT=https://<tu-resource>.openai.azure.com
 AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
 ```
 
-### 4. AOpen the HTML and run the app
+### 4. Open the HTML and run the app
 ```bash
 start .\static\index-scraping.html
 uvicorn app.scraper_api:app --reload --port 8001
