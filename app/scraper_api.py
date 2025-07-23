@@ -36,6 +36,12 @@ class URLRequest(BaseModel):
 
 class Pregunta(BaseModel):
     texto: str
+    tono: str = "neutral"
+    nivel_tecnico: str = "intermedio"
+    poder_adquisitivo: str = "medio"
+    rol: str = "general"
+    idioma: str = "español"
+
 
 client = AzureOpenAI(
     api_key=AZURE_OPENAI_KEY,
@@ -143,7 +149,7 @@ Pregunta:
     respuesta = client.chat.completions.create(
         model=AZURE_OPENAI_DEPLOYMENT,
         messages=[
-            {"role": "system", "content": "Eres un asistente experto que responde con el contexto dado y aclara si responde con información externa."},
+            {"role": "system", "content": "Eres un asistente experto que responde con el contexto proporcionado. Tu respuesta debe estar escrita en {pregunta.idioma}, con un tono {pregunta.tono}, adaptada a un perfil con nivel técnico {pregunta.nivel_tecnico} y poder adquisitivo {pregunta.poder_adquisitivo}. Dirígete a una persona con el rol de {pregunta.rol}. Responde con el contexto dado y aclara si respondes con información externa"},
             {"role": "user", "content": prompt}
         ],
         temperature=0.2,

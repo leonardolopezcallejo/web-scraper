@@ -4,7 +4,7 @@ POC that allows scraping text from a URL, storing it in Azure Cognitive Search, 
 
 ---
 
-## 🧰 Tecnologías usadas
+## 🧰 Technology
 
 - `FastAPI` para Python backend
 - `BeautifulSoup` to scrap HTML text
@@ -27,14 +27,14 @@ pip --version
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/tu-usuario/notion-rag-poc.git
+git clone https://github.com/leonardolopezcallejo/web-scraper.git
 cd web-scraper
 ```
 
 ### 2. Create virtual environment and install dependencies
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # o .venv\Scripts\activate en Windows
+.venv\Scripts\activate
 
 pip install -r requirements.txt
 ```
@@ -52,6 +52,6 @@ AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
 
 ### 4. Open the HTML and run the app
 ```bash
-start .\static\index-scraping.html
+start .\static\index.html
 uvicorn app.scraper_api:app --reload --port 8001
 ```
