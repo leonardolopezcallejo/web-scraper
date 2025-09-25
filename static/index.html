@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web Scraping by Garaje</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -25,23 +29,32 @@
 
     .container {
       display: flex;
+      flex-direction: column;
       flex: 1;
     }
 
     .panel {
-      width: 50%;
       padding: 20px;
-      overflow-y: auto;
-      box-sizing: border-box;
+      background-color: #ffffff;
     }
 
     .scraper {
-      background-color: #ffffff;
-      border-right: 1px solid #ddd;
+      min-height: 120px;
+      max-height: 25vh;
+      overflow-y: auto;
+    }
+
+    .divider {
+      height: 3px;
+      background-color: #1a73e8;
+      border: none;
+      margin: 0;
     }
 
     .chat {
-      background-color: #ffffff;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
     }
 
     h2 {
@@ -49,7 +62,8 @@
       color: #333;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    select {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
@@ -70,15 +84,40 @@
       background-color: #155ab6;
     }
 
+    .formulario-chat {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .formulario-chat > *:last-child {
+      grid-column: span 3;
+    }
+
     #conversacion {
       border: 1px solid #ccc;
       border-radius: 6px;
       padding: 16px;
       background-color: #fafafa;
-      height: 60vh;
+      flex: 1;
       overflow-y: auto;
       white-space: pre-wrap;
-      margin-bottom: 10px;
+      margin-top: 10px;
+    }
+
+    .parametros {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .parametros label {
+      font-weight: bold;
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
     }
   </style>
 </head>
@@ -86,6 +125,7 @@
   <h1>Web Scraping by Garaje</h1>
 
   <div class="container">
+    <!-- Parte superior -->
     <div class="panel scraper">
       <h2>1️⃣ Scrapeo de URL</h2>
       <input type="text" id="url" placeholder="Introduce una URL para scrapear..." />
@@ -93,11 +133,66 @@
       <div id="estadoScraper"></div>
     </div>
 
+    <!-- Barra divisoria -->
+    <hr class="divider" />
+
+    <!-- Parte inferior -->
     <div class="panel chat">
       <h2>2️⃣ Asistente IA</h2>
+
+      <div class="parametros">
+  <div>
+    <label for="tono">Tono de respuesta</label>
+    <select id="tono">
+      <option value="neutral" selected>Neutral</option>
+      <option value="formal">Formal</option>
+      <option value="coloquial">Coloquial</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="nivel_tecnico">Nivel técnico</label>
+    <select id="nivel_tecnico">
+      <option value="básico">Básico</option>
+      <option value="intermedio" selected>Intermedio</option>
+      <option value="avanzado">Avanzado</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="poder_adquisitivo">Poder adquisitivo</label>
+    <select id="poder_adquisitivo">
+      <option value="bajo">Bajo</option>
+      <option value="medio" selected>Medio</option>
+      <option value="alto">Alto</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="rol">Rol del usuario</label>
+    <select id="rol">
+      <option value="general" selected>General</option>
+      <option value="estudiante">Estudiante</option>
+      <option value="cliente">Cliente</option>
+      <option value="técnico">Técnico</option>
+      <option value="directivo">Directivo</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="idioma">Idioma</label>
+    <select id="idioma">
+      <option value="español" selected>Español</option>
+      <option value="inglés">Inglés</option>
+      <option value="francés">Francés</option>
+    </select>
+  </div>
+</div>
+
+<input type="text" id="entrada" placeholder="Haz tu pregunta aquí..." />
+<button id="enviar">Enviar</button>
+
       <div id="conversacion"></div>
-      <input type="text" id="entrada" placeholder="Haz tu pregunta aquí..." />
-      <button id="enviar">Enviar</button>
     </div>
   </div>
 
@@ -114,6 +209,15 @@
       const pregunta = entrada.value.trim();
       if (!pregunta) return;
 
+      const data = {
+        texto: pregunta,
+        tono: document.getElementById("tono").value,
+        nivel_tecnico: document.getElementById("nivel_tecnico").value,
+        poder_adquisitivo: document.getElementById("poder_adquisitivo").value,
+        rol: document.getElementById("rol").value,
+        idioma: document.getElementById("idioma").value
+      };
+
       conversacion.innerHTML += `🧑‍💻 Tú: ${pregunta}\n`;
       entrada.value = "";
       scrollAbajo();
@@ -121,7 +225,7 @@
       fetch("http://127.0.0.1:8001/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto: pregunta })
+        body: JSON.stringify(data)
       })
         .then(res => res.json())
         .then(data => {
@@ -148,7 +252,6 @@
 
       document.getElementById("estadoScraper").innerText = "⏳ Procesando...";
       document.getElementById("conversacion").innerHTML = ""; 
-
 
       fetch("http://127.0.0.1:8001/scrap", {
         method: "POST",
