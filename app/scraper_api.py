@@ -37,11 +37,7 @@ class URLRequest(BaseModel):
 class Pregunta(BaseModel):
     texto: str
     tono: str = "neutral"
-    nivel_tecnico: str = "intermedio"
-    poder_adquisitivo: str = "medio"
-    rol: str = "general"
-    idioma: str = "español"
-
+    tipo_respuesta: str = "explicacion detallada"
 
 client = AzureOpenAI(
     api_key=AZURE_OPENAI_KEY,
@@ -51,7 +47,7 @@ client = AzureOpenAI(
 
 def scrapear_texto(url: str) -> str:
     headers = {
-    "User-Agent": "Mozilla/5.0 (compatible; GarajeBot/1.0; +https://tu-dominio.com/bot)"
+        "User-Agent": "Mozilla/5.0 (compatible; GarajeBot/1.0; +https://tu-dominio.com/bot)"
     }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, "html.parser")
@@ -106,7 +102,6 @@ def subir_chunks(chunks, source_url):
         docs.append(doc)
     search_client.upload_documents(docs)
 
-    # Guardar los chunks enviados
     with open("data/chunks_guardados.json", "w", encoding="utf-8") as f:
         json.dump(docs, f, indent=2, ensure_ascii=False)
 
@@ -116,8 +111,6 @@ def scrapear_y_subir(data: URLRequest):
         crear_indice_vacio()
         texto = scrapear_texto(data.url)
         chunks = chunk_text(texto)
-        if chunks:
-            print("Primer fragmento:", chunks[0][:120] + "...")
         subir_chunks(chunks, data.url)
         return {"resultado": f"Scrapeo completado ({len(chunks)} fragmentos subidos)."}
     except Exception as e:
@@ -131,16 +124,20 @@ def chat(pregunta: Pregunta):
         credential=AzureKeyCredential(AZURE_SEARCH_KEY)
     )
     resultados = list(search_client.search(pregunta.texto, top=3))
-    contexto = "\n\n".join([r["content"] for r in resultados])
+    contexto = "\n\n".join([r["content"] for r in resultados if "content" in r])
 
-    # Guardar resultados de búsqueda
-    with open("data/resultados_search.json", "w", encoding="utf-8") as f:
-        json.dump(resultados, f, indent=2, ensure_ascii=False)
+    intro = "Según el contexto..."
 
-    prompt = f"""
-Usa exclusivamente el siguiente contexto para responder a la pregunta y empieza
-respondiendo por "Según el contexto...". Si la información no está contenida en el contexto,
-responde correctamente pero empezando por: "En la información dada, no hay nada sobre lo que preguntas pero..."
+    user_prompt = f"""
+Usa ÚNICAMENTE el siguiente contexto para responder la pregunta.
+Si encuentras información relevante, empieza tu respuesta con:
+- "{intro}"
+Si NO, empieza con:
+- "En la información dada, no hay nada sobre lo que preguntas pero..."
+
+Adapta la respuesta a:
+- Tono: {pregunta.tono}
+- Tipo de respuesta: {pregunta.tipo_respuesta}
 
 Contexto:
 {contexto}
@@ -149,11 +146,18 @@ Pregunta:
 {pregunta.texto}
 """
 
+    system_message = (
+        "Eres un asistente experto. "
+        f"Adapta tu tono a '{pregunta.tono}'. "
+        f"Redacta el contenido como una '{pregunta.tipo_respuesta}'. "
+        "Responde solo con el contexto proporcionado y aclara si utilizas información externa."
+    )
+
     respuesta = client.chat.completions.create(
         model=AZURE_OPENAI_DEPLOYMENT,
         messages=[
-            {"role": "system", "content": f"Eres un asistente experto que responde con el contexto proporcionado. Tu respuesta debe estar escrita en {pregunta.idioma}, con un tono {pregunta.tono}, adaptada a un perfil con nivel técnico {pregunta.nivel_tecnico} y poder adquisitivo {pregunta.poder_adquisitivo}. Dirígete a una persona con el rol de {pregunta.rol}. Responde con el contexto dado y aclara si respondes con información externa"},
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_prompt}
         ],
         temperature=0.2,
         max_tokens=4000
