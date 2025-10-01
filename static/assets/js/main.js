@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    function scrapearYSubir() {
+     window.scrapearYSubir = function () {
       const url = document.getElementById("url").value.trim();
       if (!url) return;
 
