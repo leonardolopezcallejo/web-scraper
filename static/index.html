@@ -4,212 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web Scraping by Garaje</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f2f2f2;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
 
-    h1 {
-      text-align: center;
-      background-color: #1a73e8;
-      color: white;
-      margin: 0;
-      padding: 15px;
-    }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
-    .top-panel {
-      padding: 10px 20px;
-      background-color: #fff;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      border-bottom: 2px solid #ccc;
-    }
+  <link rel="stylesheet" href="assets/css/style.css">
 
-    .bottom-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      background-color: #ffffff;
-    }
-
-    .config-inputs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    select, input[type="text"] {
-      padding: 8px;
-      font-size: 14px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 14px;
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #155ab6;
-    }
-
-    #conversacion {
-      flex: 1;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 16px;
-      background-color: #fafafa;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
 <body>
-  <h1>Web Scraping by Garaje</h1>
-
-  <div class="top-panel">
-    <input type="text" id="url" placeholder="Introduce una URL para scrapear..." style="flex: 1;" />
-    <button onclick="scrapearYSubir()">Scrapear e indexar</button>
-    <div id="estadoScraper"></div>
-  </div>
-
-  <div class="bottom-panel">
-    <div class="config-inputs">
-      <label>Tono
-        <select id="tono">
-          <option value="neutral">Neutral</option>
-          <option value="formal">Formal</option>
-          <option value="coloquial">Coloquial</option>
-        </select>
-      </label>
-
-      <label>Tipo de respuesta
-        <select id="tipo_respuesta">
-          <option value="resumen">Resumen</option>
-          <option value="explicacion detallada">Explicación detallada</option>
-          <option value="lista de puntos">Lista de puntos</option>
-        </select>
-      </label>
+  <main>
+    <div class="container">
+      <div class="wrapper">
+        <h1>Web Scraping by Garaje</h1>
+        <div class="top-panel">
+          <input type="text" id="url" class="top-panel-input" placeholder="Introduce una URL para scrapear..."/>
+          <button class="top-panel-button" onclick="scrapearYSubir()">Scrapear e indexar</button>
+          <div id="estadoScraper"></div>
+        </div>
+        <div class="bottom-panel">
+          <div class="config-inputs">
+            <label>Tono
+              <select id="tono">
+                <option value="neutral">Neutral</option>
+                <option value="formal">Formal</option>
+                <option value="coloquial">Coloquial</option>
+              </select>
+            </label>
+            <label>Tipo de respuesta
+              <select id="tipo_respuesta">
+                <option value="resumen">Resumen</option>
+                <option value="explicacion detallada">Explicación detallada</option>
+                <option value="lista de puntos">Lista de puntos</option>
+              </select>
+            </label>
+          </div>
+          <div id="conversacion"></div>
+          <div class="question">
+            <input type="text" id="entrada" class="bottom-panel-input" placeholder="Haz tu pregunta aquí..." />
+            <button id="enviar" class="bottom-panel-button">Enviar</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </main>
 
-    <div id="conversacion"></div>
-
-    <input type="text" id="entrada" placeholder="Haz tu pregunta aquí..." />
-    <button id="enviar">Enviar</button>
-  </div>
-
-  <script>
-    // Flag para activar/desactivar modo fake
-    const USE_FAKE = true;
-
-    const entrada = document.getElementById("entrada");
-    const enviarBtn = document.getElementById("enviar");
-    const conversacion = document.getElementById("conversacion");
-
-    // Respuestas fake
-    const fakeChatResponses = [
-      "Según el contexto... esta es una respuesta simulada breve.",
-      "Según el contexto... aquí tienes una explicación más larga y detallada simulada.",
-      "Según el contexto... lista de puntos simulada:\n- Punto 1\n- Punto 2\n- Punto 3"
-    ];
-    const fakeScrapResponse = "Scrapeo completado (12 fragmentos subidos).";
-
-    function scrollAbajo() {
-      conversacion.scrollTop = conversacion.scrollHeight;
-    }
-
-    function enviarPregunta() {
-      const pregunta = entrada.value.trim();
-      if (!pregunta) return;
-
-      const tono = document.getElementById("tono").value;
-      const tipo_respuesta = document.getElementById("tipo_respuesta").value;
-
-      conversacion.innerHTML += `\n🧑‍💻 Tú: ${pregunta}\n`;
-      entrada.value = "";
-      scrollAbajo();
-
-      if (USE_FAKE) {
-        // Respuesta fake
-        setTimeout(() => {
-          const randomResp = fakeChatResponses[Math.floor(Math.random() * fakeChatResponses.length)];
-          conversacion.innerHTML += `🤖 IA: ${randomResp}\n\n`;
-          scrollAbajo();
-        }, 600);
-      } else {
-        // Llamada real
-        fetch("http://127.0.0.1:8001/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ texto: pregunta, tono, tipo_respuesta })
-        })
-          .then(res => res.json())
-          .then(data => {
-            conversacion.innerHTML += `🤖 IA: ${data.respuesta}\n\n`;
-            scrollAbajo();
-          })
-          .catch(err => {
-            conversacion.innerHTML += `❌ Error: ${err}\n\n`;
-            scrollAbajo();
-          });
-      }
-    }
-
-    enviarBtn.addEventListener("click", enviarPregunta);
-    entrada.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        enviarPregunta();
-      }
-    });
-
-    function scrapearYSubir() {
-      const url = document.getElementById("url").value.trim();
-      if (!url) return;
-
-      document.getElementById("estadoScraper").innerText = "⏳ Procesando...";
-      document.getElementById("conversacion").innerHTML = "";
-
-      if (USE_FAKE) {
-        setTimeout(() => {
-          document.getElementById("estadoScraper").innerText = `✅ ${fakeScrapResponse}`;
-        }, 1000);
-      } else {
-        fetch("http://127.0.0.1:8001/scrap", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url })
-        })
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById("estadoScraper").innerText = `✅ ${data.resultado}`;
-          })
-          .catch(err => {
-            document.getElementById("estadoScraper").innerText = `❌ Error: ${err}`;
-          });
-      }
-    }
-  </script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
