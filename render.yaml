@@ -13,7 +13,7 @@ services:
         - app/**/*
         - Dockerfile
 
-  - type: static
+  - type: web
     name: web-scraper-frontend
     repo: https://github.com/leonardolopezcallejo/web-scraper
     branch: main
