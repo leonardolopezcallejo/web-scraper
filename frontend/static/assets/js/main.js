@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
         // Flag para activar/desactivar modo fake
-    const USE_FAKE = true;
+    const USE_FAKE = false;
 
     const entrada = document.getElementById("entrada");
     const enviarBtn = document.getElementById("enviar");

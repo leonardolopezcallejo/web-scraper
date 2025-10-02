@@ -163,4 +163,6 @@ Pregunta:
         max_tokens=4000
     )
 
+    
+
     return {"respuesta": respuesta.choices[0].message.content}
