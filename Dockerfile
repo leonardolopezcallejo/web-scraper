@@ -1,21 +1,20 @@
-# Etapa base con Python
+# Etapa base
 FROM python:3.11-slim
 
-# Crear directorio de trabajo
-WORKDIR /code
+# Establece el directorio de trabajo
+WORKDIR /app
 
-# Copiar dependencias
+# Copia solo requirements.txt primero (para cachear dependencias)
 COPY requirements.txt .
 
-# Instalar dependencias
+# Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el backend y frontend
-COPY app ./app
-COPY frontend ./frontend
+# Copia el código del backend
+COPY ./app /app
 
-# Exponer el puerto estándar
+# Expone el puerto de FastAPI
 EXPOSE 8000
 
-# Comando para ejecutar FastAPI con Uvicorn
-CMD ["uvicorn", "app.scraper_api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando para ejecutar FastAPI
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
