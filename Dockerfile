@@ -15,4 +15,3 @@ EXPOSE 8000
 
 # Entry point correcto
 CMD ["uvicorn", "frontend_server:app", "--host", "0.0.0.0", "--port", "8000"]
-

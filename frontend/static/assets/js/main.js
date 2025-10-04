@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 600);
       } else {
         // Llamada real
-        fetch("http://127.0.0.1:8001/chat", {
+        fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ texto: pregunta, tono, tipo_respuesta })
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
           document.getElementById("estadoScraper").innerText = `✅ ${fakeScrapResponse}`;
         }, 1000);
       } else {
-        fetch("http://127.0.0.1:8001/scrap", {
+        fetch("/api/scrap", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url })
