@@ -134,8 +134,6 @@ def chat(pregunta: Pregunta):
 Usa ÚNICAMENTE el siguiente contexto para responder la pregunta.
 Si encuentras información relevante, empieza tu respuesta con:
 - "{intro}"
-Si NO, empieza con:
-- "En la información dada, no hay nada sobre lo que preguntas pero..."
 
 Adapta la respuesta a:
 - Tono: {pregunta.tono}
