@@ -8,7 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia código fuente
-COPY ./app /app
+COPY . /app
 
 # Puerto expuesto
 EXPOSE 8000

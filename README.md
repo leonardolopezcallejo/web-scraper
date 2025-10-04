@@ -50,7 +50,7 @@ AZURE_OPENAI_ENDPOINT=https://<tu-resource>.openai.azure.com
 AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
 ```
 
-### 4. Open the HTML and run the app
+### 4. Run backend, frontend and open server with the app
 ```bash
 uvicorn frontend_server:app --reload
 uvicorn app.scraper_api:app --reload --port 8001
