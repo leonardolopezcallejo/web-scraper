@@ -52,6 +52,7 @@ AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
 
 ### 4. Open the HTML and run the app
 ```bash
-start .\static\index.html
+uvicorn frontend_server:app --reload
 uvicorn app.scraper_api:app --reload --port 8001
+Start-Process "http://127.0.0.1:8000/"
 ```

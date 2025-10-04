@@ -14,4 +14,5 @@ COPY ./app /app
 EXPOSE 8000
 
 # Entry point correcto
-CMD ["uvicorn", "scraper_api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "frontend_server:app", "--host", "0.0.0.0", "--port", "8000"]
+
