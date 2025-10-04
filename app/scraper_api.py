@@ -102,6 +102,8 @@ def subir_chunks(chunks, source_url):
         docs.append(doc)
     search_client.upload_documents(docs)
 
+    os.makedirs("data", exist_ok=True)
+
     with open("data/chunks_guardados.json", "w", encoding="utf-8") as f:
         json.dump(docs, f, indent=2, ensure_ascii=False)
 
